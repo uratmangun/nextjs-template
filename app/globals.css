@@ -126,3 +126,29 @@
     @apply bg-background text-foreground;
   }
 }
+
+.chat-scrollbar {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(34 211 238 / 0.45) transparent;
+}
+
+.chat-scrollbar::-webkit-scrollbar {
+  width: 0.75rem;
+}
+
+.chat-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-scrollbar::-webkit-scrollbar-thumb {
+  background: rgb(51 65 85 / 0.9);
+  border: 0.2rem solid transparent;
+  border-radius: 9999px;
+  background-clip: padding-box;
+}
+
+.chat-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: rgb(34 211 238 / 0.45);
+  background-clip: padding-box;
+}

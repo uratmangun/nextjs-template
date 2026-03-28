@@ -1,7 +1,7 @@
 "use client";
 
 import { validateProviderBaseUrl } from "@/lib/provider-url";
-import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 
 type UiModel = {
   id: string;
@@ -40,9 +40,9 @@ const emptySettings: ChatSettings = {
 };
 
 const suggestedPrompts = [
-  "Explain how React Server Components differ from client components.",
-  "Draft a landing page headline and three supporting bullets for a scholarship verifier app.",
-  "Summarize the latest work in this repository and suggest next implementation steps.",
+  "How do I create a private GitHub repository from this template with gh CLI?",
+  "Show me the gh CLI command to generate a new project from this template and clone it locally.",
+  "What should I customize first after creating a repo from this Next.js template?",
 ];
 
 function readStoredSettings(): ChatSettings {
@@ -93,6 +93,8 @@ export default function Page() {
   const [chatError, setChatError] = useState<string | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
   const [status, setStatus] = useState<"ready" | "submitted" | "streaming" | "error">("ready");
+  const [isShortViewport, setIsShortViewport] = useState(false);
+  const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(true);
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const previousMessageCountRef = useRef(0);
 
@@ -105,6 +107,31 @@ export default function Page() {
     if (!nextSettings.baseURL) {
       setIsSettingsOpen(true);
     }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia("(max-height: 500px), (max-width: 640px)");
+
+    const syncViewportState = (matches: boolean) => {
+      setIsShortViewport(matches);
+      setIsHeaderCollapsed(matches);
+    };
+
+    syncViewportState(mediaQuery.matches);
+
+    const handleChange = (event: MediaQueryListEvent) => {
+      syncViewportState(event.matches);
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+    };
   }, []);
 
   const loadModels = useCallback(async (currentSettings: ChatSettings) => {
@@ -161,6 +188,8 @@ export default function Page() {
     [models, selectedModelId]
   );
 
+  const isHeaderDetailsVisible = !isShortViewport || !isHeaderCollapsed;
+
   const groupedModels = useMemo(() => {
     const groups = new Map<string, UiModel[]>();
 
@@ -179,11 +208,14 @@ export default function Page() {
       return;
     }
 
-    if (messages.length > previousMessageCountRef.current) {
+    const distanceFromBottom = viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight;
+    const shouldStickToBottom = distanceFromBottom < 96 || messages.length > previousMessageCountRef.current;
+
+    if (shouldStickToBottom) {
       requestAnimationFrame(() => {
         viewport.scrollTo({
           top: viewport.scrollHeight,
-          behavior: "smooth",
+          behavior: messages.length > previousMessageCountRef.current ? "smooth" : "auto",
         });
       });
     }
@@ -293,6 +325,20 @@ export default function Page() {
     await handleSendText(input);
   };
 
+  const handleInputKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key !== "Enter" || !event.ctrlKey) {
+      return;
+    }
+
+    if (!input.trim() || (status !== "ready" && status !== "error") || isChatDisabled) {
+      event.preventDefault();
+      return;
+    }
+
+    event.preventDefault();
+    event.currentTarget.form?.requestSubmit();
+  };
+
   const handleSaveSettings = async () => {
     const trimmedSettings = {
       apiKey: draftSettings.apiKey.trim(),
@@ -334,34 +380,36 @@ export default function Page() {
 
   return (
     <>
-      <main className="min-h-screen bg-slate-950 px-4 py-8 text-slate-100 sm:px-6 sm:py-10">
-        <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-5xl flex-col overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 shadow-2xl shadow-cyan-950/20">
-          <header className="border-b border-slate-800 px-6 py-6 sm:px-8">
-            <div className="space-y-4">
-              <div className="inline-flex rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-200">
-                Browser-configured OpenAI-compatible chat template
-              </div>
-              <div className="space-y-2">
-                <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+      <main className="box-border h-dvh overflow-hidden bg-slate-950 px-2 py-2 text-slate-100 sm:px-6 sm:py-10">
+        <div className="mx-auto flex h-full min-h-0 w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-2xl shadow-cyan-950/20 sm:rounded-3xl">
+          <header className="border-b border-slate-800 px-3 py-2 sm:px-8 sm:py-6">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <h1 className="truncate text-base font-semibold tracking-tight text-white sm:text-4xl">
                   Simple streaming chatbot
                 </h1>
-                <p className="max-w-3xl text-sm leading-6 text-slate-300 sm:text-base">
-                  Add your own public HTTPS OpenAI-compatible base URL, optionally provide an API key,
-                  load models, and stream chat responses in the browser.
+                <p className="mt-1 hidden text-xs text-slate-400 sm:block">
+                  Browser-configured OpenAI-compatible chat template
                 </p>
               </div>
-              <div className="flex flex-wrap gap-2 text-sm text-slate-300">
-                <div className="rounded-full border border-slate-700 bg-slate-800 px-3 py-1.5">
-                  Model: <span className="font-medium text-white">{selectedModel?.name ?? "Not selected"}</span>
-                </div>
-                <div className="rounded-full border border-slate-700 bg-slate-800 px-3 py-1.5">
-                  Provider: <span className="font-medium text-white">{selectedModel?.providerLabel ?? "OpenAI-compatible API"}</span>
-                </div>
-                <div className="rounded-full border border-slate-700 bg-slate-800 px-3 py-1.5 capitalize">
-                  Status: <span className="font-medium text-white">{status}</span>
-                </div>
+
+              <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+                {isShortViewport ? (
+                  <button
+                    aria-controls="chat-header-details"
+                    aria-expanded={isHeaderDetailsVisible}
+                    className="inline-flex size-8 items-center justify-center rounded-full border border-slate-700 bg-slate-800 text-sm font-medium text-slate-100 transition hover:border-cyan-400 hover:text-cyan-200"
+                    onClick={() => setIsHeaderCollapsed((current) => !current)}
+                    type="button"
+                  >
+                    <span aria-hidden>{isHeaderDetailsVisible ? "▴" : "▾"}</span>
+                    <span className="sr-only">
+                      {isHeaderDetailsVisible ? "Hide header details" : "Show header details"}
+                    </span>
+                  </button>
+                ) : null}
                 <button
-                  className="rounded-full border border-slate-700 bg-slate-800 px-3 py-1.5 font-medium text-white transition hover:border-cyan-400 hover:text-cyan-200"
+                  className="rounded-full border border-slate-700 bg-slate-800 px-2.5 py-1 text-xs font-medium text-white transition hover:border-cyan-400 hover:text-cyan-200 sm:px-3 sm:py-1.5 sm:text-sm"
                   onClick={() => {
                     setDraftSettings(settings);
                     setSettingsError(null);
@@ -373,28 +421,54 @@ export default function Page() {
                 </button>
               </div>
             </div>
+
+            {isHeaderDetailsVisible ? (
+              <div className="mt-2 space-y-2 sm:mt-3 sm:space-y-3" id="chat-header-details">
+                <div className="hidden max-w-full rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-[11px] font-medium text-cyan-200 sm:inline-flex">
+                  Browser-configured OpenAI-compatible chat template
+                </div>
+                <p className="max-w-3xl text-xs leading-4 text-slate-300 sm:text-base sm:leading-6">
+                  Add your own public HTTPS OpenAI-compatible base URL, optionally provide an API key,
+                  load models, and stream chat responses in the browser.
+                </p>
+                <div className="flex flex-wrap gap-1 text-xs text-slate-300 sm:gap-2 sm:text-sm">
+                  <div className="rounded-full border border-slate-700 bg-slate-800 px-2 py-0.5 capitalize sm:px-3 sm:py-1.5">
+                    Status: <span className="font-medium text-white">{status}</span>
+                  </div>
+                  <div className="hidden rounded-full border border-slate-700 bg-slate-800 px-2.5 py-1 sm:block sm:px-3 sm:py-1.5">
+                    Model: <span className="font-medium text-white">{selectedModel?.name ?? "Not selected"}</span>
+                  </div>
+                  <div className="hidden rounded-full border border-slate-700 bg-slate-800 px-2.5 py-1 sm:block sm:px-3 sm:py-1.5">
+                    Provider: <span className="font-medium text-white">{selectedModel?.providerLabel ?? "OpenAI-compatible API"}</span>
+                  </div>
+                </div>
+              </div>
+            ) : null}
           </header>
 
-          <div className="flex flex-1 flex-col px-4 pb-4 pt-4 sm:px-6 sm:pb-6 sm:pt-6">
-            <section className="flex min-h-[620px] flex-1 flex-col overflow-hidden rounded-[28px] border border-slate-800 bg-slate-950/70">
-              <div className="min-h-0 flex-1 overflow-hidden">
-                <div className="h-full overflow-y-auto px-4 py-4 sm:px-6 sm:py-6" ref={viewportRef}>
-                  <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col gap-4">
+          <div className="flex min-h-0 flex-1 flex-col px-3 pb-2 pt-2 sm:px-6 sm:pb-6 sm:pt-6">
+            <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[20px] border border-slate-800 bg-slate-950/70 sm:rounded-[24px]">
+              <div className="relative min-h-0 flex-1 overflow-hidden">
+                <div
+                  className="chat-scrollbar absolute inset-0 overflow-y-scroll overscroll-contain px-3 py-3 sm:px-6 sm:py-6"
+                  ref={viewportRef}
+                >
+                  <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col gap-2 pb-2 sm:gap-3">
                     {messages.length === 0 ? (
-                      <div className="flex min-h-full flex-col items-center justify-center rounded-3xl border border-dashed border-slate-700 bg-slate-900/60 px-6 py-10 text-center">
-                        <h2 className="text-xl font-semibold text-white">
+                      <div className="flex min-h-full flex-col items-center justify-center rounded-[22px] border border-dashed border-slate-700 bg-slate-900/60 px-3 py-4 text-center sm:rounded-3xl sm:px-6 sm:py-10">
+                        <h2 className="text-base font-semibold text-white sm:text-xl">
                           {settings.baseURL ? "Start a conversation" : "Add your API settings to begin"}
                         </h2>
-                        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+                        <p className="mt-2 max-w-2xl text-xs leading-4 text-slate-300 sm:mt-3 sm:text-sm sm:leading-6">
                           {settings.baseURL
                             ? "Choose a model, send a message, and streamed responses will appear here."
                             : "Open settings and add a public HTTPS OpenAI-compatible base URL. Localhost and private-network targets are blocked in this public template."}
                         </p>
                         {settings.baseURL ? (
-                          <div className="mt-6 grid w-full max-w-2xl gap-3">
+                          <div className="mt-3 grid w-full max-w-2xl gap-1.5 sm:mt-6 sm:gap-3">
                             {suggestedPrompts.map((prompt) => (
                               <button
-                                className="rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-left text-sm leading-6 text-slate-100 transition hover:border-cyan-400 hover:bg-slate-800"
+                                className="rounded-2xl border border-slate-700 bg-slate-900 px-3 py-2 text-left text-xs leading-4 text-slate-100 transition hover:border-cyan-400 hover:bg-slate-800 sm:px-4 sm:py-3 sm:text-sm sm:leading-6"
                                 key={prompt}
                                 onClick={() => setInput(prompt)}
                                 type="button"
@@ -405,7 +479,7 @@ export default function Page() {
                           </div>
                         ) : (
                           <button
-                            className="mt-6 rounded-full bg-cyan-500 px-4 py-2 text-sm font-medium text-slate-950 transition hover:bg-cyan-400"
+                            className="mt-3 rounded-full bg-cyan-500 px-3 py-1.5 text-xs font-medium text-slate-950 transition hover:bg-cyan-400 sm:mt-6 sm:px-4 sm:py-2 sm:text-sm"
                             onClick={() => {
                               setDraftSettings(settings);
                               setSettingsError(null);
@@ -430,7 +504,11 @@ export default function Page() {
                                 : "border border-slate-800 bg-slate-900 text-slate-100"
                             }`}
                           >
-                            <div className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                            <div
+                              className={`mb-2 text-xs font-semibold uppercase tracking-[0.2em] ${
+                                message.role === "user" ? "text-cyan-950/80" : "text-slate-400"
+                              }`}
+                            >
                               {message.role === "user" ? "You" : "Assistant"}
                             </div>
                             <div className="space-y-3 whitespace-pre-wrap break-words">
@@ -444,7 +522,7 @@ export default function Page() {
                 </div>
               </div>
 
-              <div className="border-t border-slate-800 bg-slate-900/90 p-4">
+              <div className="border-t border-slate-800 bg-slate-900/90 p-2.5 sm:p-4">
                 <div className="mx-auto flex w-full max-w-3xl flex-col gap-3">
                   {modelsMessage ? (
                     <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
@@ -458,15 +536,16 @@ export default function Page() {
                     </div>
                   ) : null}
 
-                  <form className="rounded-3xl border border-slate-800 bg-slate-950 p-3" onSubmit={handleSubmit}>
+                  <form className="rounded-[22px] border border-slate-800 bg-slate-950 p-2 sm:rounded-3xl sm:p-3" onSubmit={handleSubmit}>
                     <label className="sr-only" htmlFor="chat-input">
                       Message
                     </label>
                     <textarea
-                      className="min-h-[120px] w-full resize-none rounded-2xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm leading-6 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-cyan-400"
+                      className="min-h-[72px] w-full resize-none rounded-2xl border border-slate-800 bg-slate-900 px-3 py-2 text-xs leading-4 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-cyan-400 sm:min-h-[120px] sm:px-4 sm:py-3 sm:text-sm sm:leading-6"
                       disabled={isChatDisabled}
                       id="chat-input"
                       onChange={(event) => setInput(event.currentTarget.value)}
+                      onKeyDown={handleInputKeyDown}
                       placeholder={
                         isChatDisabled
                           ? "Open settings and add your OpenAI-compatible base URL..."

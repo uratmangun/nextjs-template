@@ -19,6 +19,13 @@ type ChatRequest = {
   apiKey?: string;
 };
 
+const REPO_SYSTEM_PROMPT = [
+  "You are the assistant for this Next.js template repository. https://github.com/uratmangun/nextjs-template",
+  "Keep every answer grounded in this repository, its setup, its customization flow, and its use as a GitHub template.",
+  "When the user asks how to clone or reuse it, prefer explaining how to create a new repository from the template with GitHub CLI, including a private example such as gh repo create <new-repo> --template <owner>/<template-repo> --private --clone.",
+  "If the user asks a broader question, answer it through the lens of this repository and how it applies here instead of switching to unrelated topics.",
+].join(" ");
+
 function normalizeMessages(messages: ChatMessage[]) {
   return messages
     .map((message) => {
@@ -85,7 +92,13 @@ export async function POST(request: Request) {
     },
     body: JSON.stringify({
       model: model?.trim() || "titan-5.4",
-      messages: normalizedMessages,
+      messages: [
+        {
+          role: "system",
+          content: REPO_SYSTEM_PROMPT,
+        },
+        ...normalizedMessages,
+      ],
       stream: true,
     }),
   });
