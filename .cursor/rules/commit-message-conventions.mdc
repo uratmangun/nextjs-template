@@ -1,0 +1,82 @@
+---
+description: "Enforces standardized conventional commit message format with emojis"
+---
+
+# Commit Message Conventions
+
+## Overview
+
+**MANDATORY**: When writing commit messages, follow this standardized format using conventional commits with emojis.
+
+### Commit Message Format
+
+```
+<type>(<scope>): <emoji> <description>
+[optional body]
+[optional footer(s)]
+```
+
+### Types and Emojis
+
+- feat: ✨ A new feature
+- fix: 🔧 A bug fix
+- docs: 📚 Documentation only changes
+- style: 💎 Changes that do not affect the meaning of the code
+- refactor: ♻️ A code change that neither fixes a bug nor adds a feature
+- perf: ⚡ A code change that improves performance
+- test: ✅ Adding missing tests or correcting existing tests
+- build: 📦 Changes that affect the build system or external dependencies
+- ci: ⚙️ Changes to CI configuration files and scripts
+- chore: 🔨 Other changes that don't modify src or test files
+- revert: ⏪ Reverts a previous commit
+
+### Commit Message Rules
+
+1. Use lowercase for type and description
+2. Keep the description under 50 characters when possible
+3. Use imperative mood ("add" not "added" or "adds")
+4. Include scope when relevant (component, module, or area affected)
+5. Always place the emoji after the colon, before the description
+6. No period at the end of the description
+7. Use body for additional context if needed (separate with blank line)
+8. Never use `Made-with: Cursor` in commit messages
+9. When attributing Cursor, use a Git trailer in footer format: `Co-authored-by: Cursor <cursoragent@cursor.com>`
+10. Keep at least one blank line between the commit body and trailer lines
+
+### Cursor Co-Author Attribution
+
+Use GitHub-compatible co-author trailers (per Git trailer format) instead of custom attribution text.
+
+Correct:
+
+```
+feat(scope): ✨ add feature
+
+Co-authored-by: Cursor <cursoragent@cursor.com>
+```
+
+Incorrect:
+
+```
+feat(scope): ✨ add feature
+
+Made-with: Cursor
+```
+
+### Breaking Changes
+
+For breaking changes, add `!` after the type/scope and include `BREAKING CHANGE:` in the footer.
+
+### Examples
+
+```
+feat(auth): ✨ add user authentication system
+fix(api): 🔧 resolve null pointer in response handler
+docs(readme): 📚 update installation instructions
+refactor(utils): ♻️ simplify date formatting logic
+feat!: ✨ redesign user API
+
+BREAKING CHANGE: user endpoint now returns different schema
+```
+
+This ensures consistent, descriptive commit messages that follow conventional commit standards while maintaining clear project history.

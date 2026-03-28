@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AI IDE Template - A minimal template for AI-powered IDE projects. Clone this template using GitHub CLI to get started quickly.">
+  <title>AI IDE Template - Clone & Deploy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-bg: #fafafa;
+      --color-bg-secondary: #f4f4f5;
+      --color-bg-tertiary: #18181b;
+      --color-text-primary: #18181b;
+      --color-text-secondary: #52525b;
+      --color-text-muted: #71717a;
+      --color-border: #d4d4d8;
+      --color-border-focus: #10b981;
+      --color-primary: #10b981;
+      --color-primary-hover: #059669;
+      --color-code: #34d399;
+      --color-warning: #f59e0b;
+      --color-warning-text: #d97706;
+      --color-code-bg: #27272a;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --transition: all 0.2s ease;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-bg: #09090b;
+        --color-bg-secondary: #18181b;
+        --color-bg-tertiary: #27272a;
+        --color-text-primary: #fafafa;
+        --color-text-secondary: #a1a1aa;
+        --color-text-muted: #71717a;
+        --color-border: #3f3f46;
+        --color-code-bg: #27272a;
+      }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text-primary);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+
+    /* Background gradient animation */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(ellipse at 20% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(6, 182, 212, 0.06) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 42rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+
+    /* Header Section */
+    .header {
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.375rem 0.875rem;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.1));
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--color-primary);
+      margin-bottom: 1rem;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .badge svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--color-text-primary) 0%, var(--color-text-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.75rem;
+      animation: slideUp 0.5s ease;
+    }
+
+    .description {
+      color: var(--color-text-secondary);
+      font-size: 1rem;
+      animation: slideUp 0.5s ease 0.1s backwards;
+    }
+
+    /* Form Section */
+    .form-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      animation: slideUp 0.5s ease 0.2s backwards;
+    }
+
+    .input-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    @media (min-width: 640px) {
+      .input-row {
+        flex-direction: row;
+        align-items: flex-start;
+      }
+    }
+
+    .input-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+    }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 0.625rem 0.875rem;
+      font-size: 0.875rem;
+      font-family: inherit;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 0.5rem;
+      color: var(--color-text-primary);
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+
+    input[type="text"]:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--color-border-focus);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15), var(--shadow-sm);
+    }
+
+    input[type="text"]::placeholder {
+      color: var(--color-text-muted);
+    }
+
+    input.has-error {
+      border-color: var(--color-warning);
+    }
+
+    input.has-error:focus {
+      border-color: var(--color-warning);
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15), var(--shadow-sm);
+    }
+
+    .error-message {
+      font-size: 0.75rem;
+      color: var(--color-warning-text);
+      display: none;
+    }
+
+    .error-message.visible {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      padding-right: 2.5rem;
+    }
+
+    @media (min-width: 640px) {
+      select {
+        width: auto;
+        min-width: 120px;
+      }
+    }
+
+    /* Command Block */
+    .command-block {
+      position: relative;
+      background: var(--color-bg-tertiary);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      box-shadow: var(--shadow-md);
+      animation: slideUp 0.5s ease 0.3s backwards;
+      overflow: hidden;
+    }
+
+    .command-block::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--color-primary), #06b6d4);
+    }
+
+    .command-code {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.875rem;
+      color: var(--color-code);
+      word-break: break-all;
+      padding-right: 3rem;
+      line-height: 1.5;
+    }
+
+    .copy-button {
+      position: absolute;
+      top: 0.625rem;
+      right: 0.625rem;
+      padding: 0.5rem;
+      background: transparent;
+      border: none;
+      border-radius: 0.375rem;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .copy-button:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--color-text-primary);
+    }
+
+    .copy-button:active {
+      transform: scale(0.95);
+    }
+
+    .copy-button svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .copy-button.copied {
+      color: var(--color-primary);
+    }
+
+    /* Options Section */
+    .options-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      animation: slideUp 0.5s ease 0.4s backwards;
+    }
+
+    .options-title {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--color-text-muted);
+    }
+
+    .options-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding-left: 0.5rem;
+    }
+
+    .options-list li {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+    }
+
+    .options-list li::before {
+      content: '•';
+      color: var(--color-primary);
+      font-weight: bold;
+    }
+
+    .option-code {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.8125rem;
+      background: var(--color-bg-secondary);
+      padding: 0.125rem 0.5rem;
+      border-radius: 0.25rem;
+      color: var(--color-text-primary);
+    }
+
+    .option-description {
+      color: var(--color-text-muted);
+    }
+
+    /* Footer */
+    .footer {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--color-border);
+      animation: slideUp 0.5s ease 0.5s backwards;
+    }
+
+    .footer-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      font-size: 0.8125rem;
+      color: var(--color-text-muted);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .footer-link:hover {
+      color: var(--color-primary);
+    }
+
+    .footer-link svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-primary);
+      padding: 0.75rem 1.25rem;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    .toast.visible {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .toast svg {
+      color: var(--color-primary);
+      width: 18px;
+      height: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <span class="badge">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+        AI IDE Template
+      </span>
+      <h1>Clone this template</h1>
+      <p class="description">Use the GitHub CLI to create a new repository from this template:</p>
+    </header>
+
+    <section class="form-section">
+      <div class="input-row">
+        <div class="input-group">
+          <input 
+            type="text" 
+            id="repoName" 
+            placeholder="Repository name" 
+            value="my-new-repo"
+            autocomplete="off"
+          >
+          <p id="errorMessage" class="error-message">Repository names cannot contain spaces. Use hyphens instead.</p>
+        </div>
+        <select id="visibility">
+          <option value="public">Public</option>
+          <option value="private">Private</option>
+        </select>
+      </div>
+    </section>
+
+    <div class="command-block">
+      <code id="commandCode" class="command-code">gh repo create my-new-repo --template uratmangun/ai-ide-template --public --clone</code>
+      <button type="button" id="copyButton" class="copy-button" aria-label="Copy command">
+        <svg id="copyIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+          <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+        </svg>
+        <svg id="checkIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="display: none;">
+          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+
+    <section class="options-section">
+      <p class="options-title">Options:</p>
+      <ul class="options-list">
+        <li>
+          <code class="option-code">--public</code>
+          <span class="option-description">— Create a public repository</span>
+        </li>
+        <li>
+          <code class="option-code">--private</code>
+          <span class="option-description">— Create a private repository</span>
+        </li>
+        <li>
+          <code class="option-code">--clone</code>
+          <span class="option-description">— Clone the new repository locally</span>
+        </li>
+      </ul>
+    </section>
+
+    <footer class="footer">
+      <a href="https://github.com/uratmangun/ai-ide-template" class="footer-link" target="_blank" rel="noopener noreferrer">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+        </svg>
+        View on GitHub
+      </a>
+      <a href="https://cli.github.com/" class="footer-link" target="_blank" rel="noopener noreferrer">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="4 17 10 11 4 5"></polyline>
+          <line x1="12" y1="19" x2="20" y2="19"></line>
+        </svg>
+        Get GitHub CLI
+      </a>
+    </footer>
+  </div>
+
+  <div id="toast" class="toast">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+    </svg>
+    <span>Command copied to clipboard!</span>
+  </div>
+
+  <script>
+    const repoNameInput = document.getElementById('repoName');
+    const visibilitySelect = document.getElementById('visibility');
+    const commandCode = document.getElementById('commandCode');
+    const copyButton = document.getElementById('copyButton');
+    const copyIcon = document.getElementById('copyIcon');
+    const checkIcon = document.getElementById('checkIcon');
+    const errorMessage = document.getElementById('errorMessage');
+    const toast = document.getElementById('toast');
+
+    const TEMPLATE_REPO = 'uratmangun/ai-ide-template';
+
+    function updateCommand() {
+      const repoName = repoNameInput.value.trim() || 'my-new-repo';
+      const visibility = visibilitySelect.value;
+      const hasSpaces = repoNameInput.value.includes(' ');
+
+      // Update error state
+      if (hasSpaces) {
+        repoNameInput.classList.add('has-error');
+        errorMessage.classList.add('visible');
+      } else {
+        repoNameInput.classList.remove('has-error');
+        errorMessage.classList.remove('visible');
+      }
+
+      // Update command
+      commandCode.textContent = `gh repo create ${repoName} --template ${TEMPLATE_REPO} --${visibility} --clone`;
+    }
+
+    async function copyToClipboard() {
+      try {
+        await navigator.clipboard.writeText(commandCode.textContent);
+        
+        // Show check icon
+        copyIcon.style.display = 'none';
+        checkIcon.style.display = 'block';
+        copyButton.classList.add('copied');
+
+        // Show toast
+        toast.classList.add('visible');
+
+        // Reset after 2 seconds
+        setTimeout(() => {
+          copyIcon.style.display = 'block';
+          checkIcon.style.display = 'none';
+          copyButton.classList.remove('copied');
+          toast.classList.remove('visible');
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    }
+
+    // Event listeners
+    repoNameInput.addEventListener('input', updateCommand);
+    visibilitySelect.addEventListener('change', updateCommand);
+    copyButton.addEventListener('click', copyToClipboard);
+
+    // Initialize
+    updateCommand();
+  </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+---
+description: Prefer non-purple primary UI colors; keep purple as secondary/accent
+alwaysApply: false
+globs: "**/*.{css,scss,sass,less,styl,html,tsx,ts,jsx,js,vue,svelte}"
+---
+
+# UI Color Palette Preference
+
+## Overview
+
+Prefer non-purple as the primary UI color. Use purple only as a secondary/accent unless brand constraints require otherwise.
+
+## Palette Priorities
+
+- Primary (preferred): blue, teal, cyan, green, neutral/gray
+- Secondary: orange, amber, slate
+- Accent-only (low priority): purple, violet, fuchsia
+
+## Common Patterns
+
+```css
+:root {
+  --color-primary: #0ea5e9;   /* blue-500 */
+  --color-secondary: #a855f7; /* violet-500 accent */
+}
+```
+
+```css
+:root {
+  --color-primary: #8b5cf6; /* avoid: purple as primary */
+}
+```
+
+```tsx
+<button className="bg-sky-600 hover:bg-sky-700 text-white">Action</button>
+```
+
+```tsx
+<button className="bg-purple-600 hover:bg-purple-700 text-white">Action</button>
+```
+
+## Additional Guidelines
+
+- Do not set purple as default brand color or primary theme token.
+- Purple can be used for highlights, badges, or low-emphasis accents.
+- Prefer accessible contrast (WCAG AA minimum for text and controls).
+- If brand guidelines mandate purple primary, note that exception explicitly.

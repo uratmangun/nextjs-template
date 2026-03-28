@@ -1,0 +1,47 @@
+---
+description: Use fish-shell syntax for terminal commands
+alwaysApply: false
+globs: "**/*"
+---
+
+# Shell Execution Standards
+
+## Fish Shell Requirement
+
+Use fish-shell syntax for terminal commands instead of bash syntax.
+
+## Core Syntax Rules
+
+- Variables: `set VAR_NAME value` (not `export VAR=value`)
+- Environment: `set -x VAR value` (exported variables)
+- Conditionals: `if test condition; command; end`
+- Logic: use `; and` / `; or` (not `&&` / `||`)
+
+## Essential Fish Commands
+
+```fish
+set PROJECT_ID (grep "^project_id" config.toml | cut -d"\"" -f2)
+if test -f file.txt; echo "exists"; end
+set -x NODE_ENV production
+set -U EDITOR vim
+```
+
+## Common Bash to Fish Conversions
+
+- `export VAR=value` -> `set -x VAR value`
+- `cmd1 && cmd2` -> `cmd1; and cmd2`
+- `cmd1 || cmd2` -> `cmd1; or cmd2`
+- `if [ condition ]` -> `if test condition`
+
+## Project Patterns
+
+```fish
+set CONTAINER_ID (docker ps --filter "name=pattern" --format "{{.ID}}")
+set CONFIG_VALUE (grep "^key" config.file | cut -d"\"" -f2)
+
+if test -n "$CONTAINER_ID"
+    docker exec $CONTAINER_ID command
+else
+    echo "Container not found"
+end
+```
