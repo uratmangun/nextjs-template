@@ -1,107 +1,128 @@
-# AI IDE Template
+# Next.js Template
 
-A minimal template for AI-powered IDE projects with pre-configured settings for popular AI coding assistants.
+A minimal Next.js 16 template that deploys to Cloudflare Workers with `@opennextjs/cloudflare` and Wrangler.
 
-[Deploy to Cloudflare Pages with Wrangler CLI](https://developers.cloudflare.com/pages/framework-guides/deploy-a-static-html-site/)
+Live demo: https://nextjs-template.gule.workers.dev
 
-## 🚀 Quick Start
+## What’s included
 
-### Prerequisites
+- Next.js App Router app
+- Cloudflare Workers deployment via OpenNext
+- Local Workers preview with Wrangler
+- Browser-configured OpenAI-compatible chat settings
+- Server-side base URL hardening for public template safety
+- Static asset caching via `public/_headers`
 
-Make sure you have the [GitHub CLI](https://cli.github.com/) installed:
+## Template behavior
 
-```bash
-# macOS
-brew install gh
+This template keeps provider configuration in the browser:
 
-# Windows
-winget install --id GitHub.cli
+- `baseURL` is stored in `localStorage`
+- `apiKey` is stored in `localStorage`
+- available models are loaded from `POST /api/models`
+- chat streaming is proxied through `POST /api/chat`
 
-# Linux (Debian/Ubuntu)
-sudo apt install gh
+Because this repository is meant to be public and reusable, the server validates the configured provider URL before proxying requests.
 
-# Authenticate with GitHub
-gh auth login
+Allowed provider URLs must:
+
+- use `https`
+- point to a public host
+- not target `localhost` or private network IPs
+- not include embedded credentials
+- not include query strings or hash fragments
+
+Example valid base URL:
+
+```text
+https://api.openai.com/v1
 ```
 
-### Clone this Template
+## Prerequisites
 
-Use the GitHub CLI to create a new repository from this template:
+- Node.js 20+
+- `pnpm`
+- Cloudflare account
+- Wrangler authenticated with your Cloudflare account
 
-#### Create a Private Repository (Recommended)
-
-```bash
-gh repo create my-new-repo --template uratmangun/ai-ide-template --private --clone
-```
-
-#### Create a Public Repository
+## Install
 
 ```bash
-gh repo create my-new-repo --template uratmangun/ai-ide-template --public --clone
+pnpm install
 ```
 
-### Command Options
+## Local development
 
-| Flag | Description |
-|------|-------------|
-| `--template` | Specify the template repository to use |
-| `--private` | Create a private repository |
-| `--public` | Create a public repository |
-| `--clone` | Clone the new repository to your local machine |
-
-### Additional Options
+Run standard Next.js development:
 
 ```bash
-# Create without cloning (useful for remote-only setup)
-gh repo create my-new-repo --template uratmangun/ai-ide-template --private
-
-# Clone to a specific directory
-gh repo create my-new-repo --template uratmangun/ai-ide-template --private --clone
-cd my-new-repo
+pnpm dev
 ```
 
-## 📁 What's Included
+Run a Cloudflare Workers preview using the OpenNext adapter:
 
-This template comes pre-configured with:
+```bash
+pnpm preview
+```
 
-- **`.agents/skills`** - Agent skills configurations
-- **`.cursor/`** - Cursor IDE settings
-- **`index.html`** - Template landing page
+The Workers preview reads `.dev.vars`.
 
-## 🔧 After Cloning
+Create it from the example if needed:
 
-1. **Navigate to your new project:**
-   ```bash
-   cd my-new-repo
-   ```
+```bash
+cp .dev.vars.example .dev.vars
+```
 
-2. **Customize the template:**
-   - Update `index.html` with your project details
-   - Modify AI assistant configurations as needed
+Current example contents:
 
-3. **Deploy to Cloudflare Pages with Wrangler CLI (optional):**
-   ```bash
-   # Install Wrangler CLI
-   bun add -g wrangler
+```text
+NEXTJS_ENV=development
+```
 
-   # Authenticate with Cloudflare
-   wrangler login
+## Deploy to Cloudflare Workers
 
-   # Create a Pages project (one-time setup)
-   wrangler pages project create my-new-repo
+This project is already configured for Workers in `wrangler.jsonc` and `open-next.config.ts`.
 
-   # Deploy the current directory
-   wrangler pages deploy . --project-name my-new-repo
-   ```
+Deploy with:
 
-## 🌐 Live Demo
+```bash
+pnpm run deploy
+```
 
-Visit the template landing page: [https://ai-ide-template.pages.dev](https://ai-ide-template.pages.dev)
+Useful related commands:
 
-## 📝 License
+```bash
+pnpm run upload
+pnpm run cf-typegen
+```
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## Worker configuration
 
----
+The deployed Worker uses:
 
-Made with ❤️ for the AI-assisted development community
+- service name: `nextjs-template`
+- default domain: `https://nextjs-template.gule.workers.dev`
+- compatibility flags:
+  - `nodejs_compat`
+  - `global_fetch_strictly_public`
+
+Static assets are served from `.open-next/assets`, and `_next/static` assets are cached aggressively through `public/_headers`.
+
+## Project files
+
+- `app/page.tsx` — chat UI and browser-side provider settings
+- `app/api/models/route.ts` — loads models from an OpenAI-compatible `/models` endpoint
+- `app/api/chat/route.ts` — streams chat completions from an OpenAI-compatible `/chat/completions` endpoint
+- `lib/provider-url.ts` — validates public HTTPS provider URLs
+- `wrangler.jsonc` — Cloudflare Worker configuration
+- `open-next.config.ts` — OpenNext Cloudflare adapter config
+
+## Notes for template users
+
+If you create a new repository from this template, you will usually want to update:
+
+- the Worker name in `wrangler.jsonc`
+- the GitHub repository homepage URL
+- the app metadata and branding
+
+After renaming the Worker, redeploy with Wrangler to get your own `*.workers.dev` URL.

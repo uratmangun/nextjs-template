@@ -1,0 +1,53 @@
+---
+description: "Use pnpm first for dependency installs; install pnpm if missing, then fall back to npm only if pnpm fails"
+---
+
+# Package Installation Preference
+
+## Overview
+
+**MANDATORY**: Use `pnpm` first for all dependency installation and package management tasks.
+
+## Dependency Installation Workflow
+
+When asked to install packages, add dependencies, or run package-manager-driven setup:
+
+1. Check whether `pnpm` is available.
+2. If `pnpm` is not installed, install it first.
+3. Retry the requested package operation with `pnpm`.
+4. If the `pnpm` command still fails because of an environment or compatibility issue, fall back to `npm`.
+
+## Command Preference
+
+- Prefer `pnpm add <pkg>` over `npm install <pkg>`
+- Prefer `pnpm add -D <pkg>` over `npm install -D <pkg>`
+- Prefer `pnpm install` over `npm install`
+- Prefer `pnpm run <script>` when package-manager context matters
+
+## Fallback Policy
+
+Use `npm` only after:
+
+- confirming `pnpm` is unavailable and installing it did not resolve the issue, or
+- confirming the `pnpm` operation itself failed and the task still needs completion
+
+## Examples
+
+```bash
+# Preferred path
+pnpm add zod
+pnpm add -D typescript
+pnpm install
+
+# If pnpm is missing, install it first
+npm install -g pnpm
+
+# Only if pnpm still fails, use npm as fallback
+npm install zod
+```
+
+## Notes
+
+- Keep existing lockfile/package-manager conventions unless the user explicitly asks to change them.
+- If falling back to `npm`, briefly note why `pnpm` could not be used.
+- Apply this rule lazily when tasks involve dependency installation, dependency updates, bootstrapping, or package manager commands.

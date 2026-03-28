@@ -24,6 +24,11 @@ When creating UI components, styling, or choosing color palettes:
 When executing terminal commands or writing shell scripts:
 @.opencode/rules/shell-preferences.mdc
 
+### Package Management
+
+When installing dependencies, running package-manager setup, or adding/removing packages:
+@.opencode/rules/pnpm-first-with-npm-fallback.mdc
+
 ### Commit Messages
 
 When writing commit messages:

@@ -11,6 +11,16 @@
       "sourceType": "github",
       "computedHash": "18ddb1893c48233e73674aa00a28c62f75b55901ac7d24190575e72397a2b27a"
     },
+    "ai-elements": {
+      "source": "vercel/ai-elements",
+      "sourceType": "github",
+      "computedHash": "84f3a2a57fa71ae5061786280987575d673792d6dda9a63941efb2795b83543a"
+    },
+    "ai-sdk": {
+      "source": "vercel/ai",
+      "sourceType": "github",
+      "computedHash": "58ce68f628890c3925aea2b5435a649251ac182057541045c68fc19a27aaa0ec"
+    },
     "but": {
       "source": "gitbutlerapp/gitbutler",
       "sourceType": "github",
@@ -45,6 +55,11 @@
       "source": "msmps/pilotty",
       "sourceType": "github",
       "computedHash": "0d845bcd0eda2296197a40bcce918afe6e05ea1ded6601a2aaf16da583531826"
+    },
+    "shadcn": {
+      "source": "shadcn/ui",
+      "sourceType": "github",
+      "computedHash": "507f011a70e8b3ae242bdc0bb5b39fd91a1d4049a0f3c281991ccf84973d591c"
     },
     "skill-creator": {
       "source": "anthropics/skills",
