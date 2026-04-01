@@ -428,7 +428,7 @@ export default function Page() {
                   Browser-configured OpenAI-compatible chat template
                 </div>
                 <p className="max-w-3xl text-xs leading-4 text-slate-300 sm:text-base sm:leading-6">
-                  Add your own public HTTPS OpenAI-compatible base URL, optionally provide an API key,
+                  Add your own public HTTPS OpenAI-compatible URL, optionally provide an API key,
                   load models, and stream chat responses in the browser.
                 </p>
                 <div className="flex flex-wrap gap-1 text-xs text-slate-300 sm:gap-2 sm:text-sm">
@@ -462,7 +462,7 @@ export default function Page() {
                         <p className="mt-2 max-w-2xl text-xs leading-4 text-slate-300 sm:mt-3 sm:text-sm sm:leading-6">
                           {settings.baseURL
                             ? "Choose a model, send a message, and streamed responses will appear here."
-                            : "Open settings and add a public HTTPS OpenAI-compatible base URL. Localhost and private-network targets are blocked in this public template."}
+                            : "Open settings and add a public HTTPS OpenAI-compatible URL. Localhost and private-network targets are blocked in this public template."}
                         </p>
                         {settings.baseURL ? (
                           <div className="mt-3 grid w-full max-w-2xl gap-1.5 sm:mt-6 sm:gap-3">
@@ -548,7 +548,7 @@ export default function Page() {
                       onKeyDown={handleInputKeyDown}
                       placeholder={
                         isChatDisabled
-                          ? "Open settings and add your OpenAI-compatible base URL..."
+                          ? "Open settings and add your OpenAI-compatible URL..."
                           : "Ask about your app, architecture, or anything you want to explore..."
                       }
                       value={input}
@@ -615,7 +615,7 @@ export default function Page() {
             <div className="space-y-2">
               <h2 className="text-xl font-semibold text-white">Chat provider settings</h2>
               <p className="text-sm leading-6 text-slate-300">
-                Add a public HTTPS OpenAI-compatible base URL to enable model loading and chat
+                Add a public HTTPS OpenAI-compatible URL to enable model loading and chat
                 streaming. API key is optional unless your provider requires authentication.
               </p>
             </div>
@@ -623,7 +623,7 @@ export default function Page() {
             <div className="mt-6 space-y-4">
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-slate-100" htmlFor="base-url">
-                  Base URL
+                  OpenAI-compatible URL
                 </label>
                 <input
                   className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-cyan-400"
