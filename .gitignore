@@ -7,3 +7,26 @@ out
 .env.local
 .env*.local
 .dev.vars*
+
+# --- cascade-archive ---
+node_modules/
+.next/
+.turbo/
+dist/
+build/
+coverage/
+out/
+.venv/
+venv/
+__pycache__/
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+!.env.example.*
+credentials.json
+*.pem
+*.sst
+.next/dev/cache/turbopack/600cd2fe/00000214.sst
+.next/dev/cache/turbopack/600cd2fe/00000922.sst
